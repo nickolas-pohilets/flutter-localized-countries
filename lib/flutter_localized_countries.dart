@@ -6,14 +6,15 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
 
-class CountryNames {
-  static CountryNames of(BuildContext context) {
-    return Localizations.of<CountryNames>(context, CountryNames);
+// Base class for country and locale names
+class _BaseNames<T> {
+  static T of<T>(BuildContext context) {
+    return Localizations.of<T>(context, CountryNames);
   }
 
   final String locale;
   final Map<String, String> data;
-  CountryNames(this.locale, this.data);
+  _BaseNames(this.locale, this.data);
 
   String nameOf(String code) => data[code];
 
@@ -24,22 +25,36 @@ class CountryNames {
   List<MapEntry<String, String>> get sortedByName {
     return data.entries.toList()..sort((a, b) => a.value.compareTo(b.value));
   }
+
+  toString() => locale;
 }
 
-class CountryNamesLocalizationsDelegate extends LocalizationsDelegate<CountryNames> {
+class CountryNames extends _BaseNames<CountryNames> {
+  CountryNames(String locale, Map<String, String> data) : super(locale, data);
+}
+
+class LocaleNames extends _BaseNames<LocaleNames> {
+  LocaleNames(String locale, Map<String, String> data) : super(locale, data);
+}
+
+abstract class _BaseNamesLocalizationsDelegate<T>
+    extends LocalizationsDelegate<T> {
   final AssetBundle bundle;
-  const CountryNamesLocalizationsDelegate({this.bundle});
+  final dataPath;
+  const _BaseNamesLocalizationsDelegate({this.bundle, this.dataPath});
 
   Future<List<String>> locales() async {
-    return List<String>.from(await _loadJSON('languages.json') as List<dynamic>);
+    return List<String>.from(
+        await _loadJSON('languages.json') as List<dynamic>);
   }
 
   @override
   bool isSupported(Locale locale) => true;
 
   @override
-  Future<CountryNames> load(Locale locale) async {
-    final String name = locale.countryCode == null ? locale.languageCode : locale.toString();
+  Future<T> load(Locale locale) async {
+    final String name =
+        locale.countryCode == null ? locale.languageCode : locale.toString();
     final String localeName = Intl.canonicalizedLocale(name);
 
     var locales = Set<String>.from(await this.locales());
@@ -47,24 +62,45 @@ class CountryNamesLocalizationsDelegate extends LocalizationsDelegate<CountryNam
     var availableLocale = Intl.verifiedLocale(
       localeName,
       (locale) => locales.contains(locale),
-      onFailure: (_) => 'en'
+      onFailure: (_) => 'en',
     );
     if (availableLocale == null) {
       return null;
     }
 
-    final data = Map<String, String>.from(await _loadJSON('data/$availableLocale.json') as Map<dynamic, dynamic>);
-    return CountryNames(availableLocale, data);
+    final data = Map<String, String>.from(
+        await _loadJSON('$dataPath/$availableLocale.json')
+            as Map<dynamic, dynamic>);
+    switch (T) {
+      case CountryNames:
+        return CountryNames(availableLocale, data) as T;
+      case LocaleNames:
+      default:
+        return LocaleNames(availableLocale, data) as T;
+    }
   }
 
   @override
-  bool shouldReload(LocalizationsDelegate<CountryNames> old) {
+  bool shouldReload(LocalizationsDelegate<T> old) {
     return false;
   }
 
   Future<dynamic> _loadJSON(key) {
     Future<dynamic> parser(String data) async => jsonDecode(data);
     final bundle = this.bundle ?? rootBundle;
-    return bundle.loadStructuredData('packages/flutter_localized_countries/' + key, parser);
+    return bundle.loadStructuredData(
+        'packages/flutter_localized_countries/' + key, parser);
   }
+}
+
+class CountryNamesLocalizationsDelegate
+    extends _BaseNamesLocalizationsDelegate<CountryNames> {
+  CountryNamesLocalizationsDelegate({AssetBundle bundle})
+      : super(bundle: bundle, dataPath: 'data/countries/');
+}
+
+class LocaleNamesLocalizationsDelegate
+    extends _BaseNamesLocalizationsDelegate<LocaleNames> {
+  LocaleNamesLocalizationsDelegate({AssetBundle bundle})
+      : super(bundle: bundle, dataPath: 'data/locales/');
 }
