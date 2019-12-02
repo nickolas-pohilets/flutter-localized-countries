@@ -22,38 +22,43 @@ class TestAssetBundle extends CachingAssetBundle {
 
 void main() {
   final bundle = TestAssetBundle();
-  var delegate = CountryNamesLocalizationsDelegate(bundle: bundle);
-  test('provides list of locales()', () {
-    expect(delegate.locales(), completion(isNotEmpty));
+
+  // Country tests
+  var countryDelegate = CountryNamesLocalizationsDelegate(bundle: bundle);
+  test('Country delegate provides list of locales()', () {
+    expect(countryDelegate.locales(), completion(isNotEmpty));
   });
 
-  void checkTranslation(Locale locale, String cc, String name) {
-    var d = delegate;
+  void checkCountryTranslation(Locale locale, String cc, String name) {
+    var d = countryDelegate;
     var f = (CountryNames cn) => cn.nameOf(cc) == name;
     var matcher = completion(predicate(f, 'name of the $cc is "$name"'));
     expect(d.load(locale), matcher);
   }
-  
-  test('localizes by language', () {
-    checkTranslation(Locale('de'), 'CH', 'Schweiz');
-    checkTranslation(Locale('en'), 'CH', 'Switzerland');
-    checkTranslation(Locale('ja'), 'CH', 'スイス');
-    checkTranslation(Locale('de'), 'CH', 'Schweiz');
+
+  test('localizes country by language', () {
+    checkCountryTranslation(Locale('de'), 'CH', 'Schweiz');
+    checkCountryTranslation(Locale('en'), 'CH', 'Switzerland');
+    checkCountryTranslation(Locale('ja'), 'CH', 'スイス');
+    checkCountryTranslation(Locale('de'), 'CH', 'Schweiz');
   });
 
-  test('localizes by language and country', () {
-    checkTranslation(Locale('de', 'CH'), 'BY', 'Weissrussland');
-    checkTranslation(Locale('de', 'AT'), 'BY', 'Belarus');
-    checkTranslation(Locale('de', 'CH'), 'GB', 'Grossbritannien');
-    checkTranslation(Locale('de'), 'GB', 'Vereinigtes Königreich');
+  test('localizes country by language and country', () {
+    checkCountryTranslation(Locale('de', 'CH'), 'BY', 'Weissrussland');
+    checkCountryTranslation(Locale('de', 'AT'), 'BY', 'Belarus');
+    checkCountryTranslation(Locale('de', 'CH'), 'GB', 'Grossbritannien');
+    checkCountryTranslation(Locale('de'), 'GB', 'Vereinigtes Königreich');
   });
-  test('language and country falls back to language only', () {
-    checkTranslation(Locale('de', 'UK'), 'GB', 'Vereinigtes Königreich');
+  test('invalid country gives null', () {
+    checkCountryTranslation(Locale('de'), 'zz', null);
   });
-  test('language falls back to English', () {
-    checkTranslation(Locale('zz'), 'GB', 'United Kingdom');
+  test('localized country falls back to language when given invalid country for locale', () {
+    checkCountryTranslation(Locale('de', 'UK'), 'GB', 'Vereinigtes Königreich');
   });
-  test('languages can be sorted by code and name', () {
+  test('localized country falls back to English when given invalid locale', () {
+    checkCountryTranslation(Locale('zz'), 'GB', 'United Kingdom');
+  });
+  test('country names can be sorted by code and name', () {
     // TODO: Sorting by name should be done in locale-aware manner
     final cn = CountryNames('foo', {
       "BL": "St. Barthélemy",
@@ -62,5 +67,53 @@ void main() {
     });
     expect(cn.sortedByCode.map((e) => e.key), ['BL', 'DE', 'US']);
     expect(cn.sortedByName.map((e) => e.key), ['DE', 'BL', 'US']);
+  });
+
+  // Locale tests
+  var localeDelegate = LocaleNamesLocalizationsDelegate(bundle: bundle);
+  test('Locale delegate provides list of locales()', () {
+    expect(localeDelegate.locales(), completion(isNotEmpty));
+  });
+
+  void checkLocaleTranslation(Locale locale, String cc, String name) {
+    var d = localeDelegate;
+    var f = (LocaleNames cn) => cn.nameOf(cc) == name;
+    var matcher = completion(predicate(f, 'name of the $cc is "$name"'));
+    expect(d.load(locale), matcher);
+  }
+
+  test('localizes locale by language', () {
+    checkLocaleTranslation(Locale('de'), 'de_CH', 'Deutsch (Schweiz)');
+    checkLocaleTranslation(Locale('en'), 'de_CH', 'German (Switzerland)');
+    checkLocaleTranslation(Locale('ja'), 'de_CH', 'ドイツ語 (スイス)');
+    checkLocaleTranslation(Locale('de'), 'de_CH', 'Deutsch (Schweiz)');
+  });
+  test('localizes locale by language and country', () {
+    checkLocaleTranslation(Locale('de', 'CH'), 'be', 'Weissrussisch');
+    checkLocaleTranslation(Locale('de', 'AT'), 'be', 'Weißrussisch');
+    checkLocaleTranslation(Locale('de', 'CH'), 'en_GB', 'Englisch (Grossbritannien)');
+    checkLocaleTranslation(Locale('de'), 'en_GB', 'Englisch (Vereinigtes Königreich)');
+  });
+  test('invalid locale gives null', () {
+    checkLocaleTranslation(Locale('de'), 'zz', null);
+  });
+  test(
+      'localized locale falls back to language when given invalid country for locale',
+      () {
+    checkLocaleTranslation(
+        Locale('de', 'UK'), 'es_AR', 'Spanisch (Argentinien)');
+  });
+  test('localized locale falls back to English when given invalid locale', () {
+    checkLocaleTranslation(Locale('zz'), 'es_AR', 'Spanish (Argentina)');
+  });
+  test('locale names can be sorted by code and name', () {
+    // TODO: Sorting by name should be done in locale-aware manner
+    final cn = LocaleNames('foo', {
+      "de": "German",
+      "ur_IN": "Urdu (India)",
+      "bo": "Tibetan",
+    });
+    expect(cn.sortedByCode.map((e) => e.key), ['bo', 'de', 'ur_IN']);
+    expect(cn.sortedByName.map((e) => e.key), ['de', 'bo', 'ur_IN']);
   });
 }
