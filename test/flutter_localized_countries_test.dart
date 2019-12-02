@@ -21,9 +21,13 @@ class TestAssetBundle extends CachingAssetBundle {
 }
 
 void main() {
+  countryTests();
+  localeTests();
+}
+
+void countryTests() {
   final bundle = TestAssetBundle();
 
-  // Country tests
   var countryDelegate = CountryNamesLocalizationsDelegate(bundle: bundle);
   test('Country delegate provides list of locales()', () {
     expect(countryDelegate.locales(), completion(isNotEmpty));
@@ -68,8 +72,11 @@ void main() {
     expect(cn.sortedByCode.map((e) => e.key), ['BL', 'DE', 'US']);
     expect(cn.sortedByName.map((e) => e.key), ['DE', 'BL', 'US']);
   });
+}
 
-  // Locale tests
+void localeTests() {
+  final bundle = TestAssetBundle();
+
   var localeDelegate = LocaleNamesLocalizationsDelegate(bundle: bundle);
   test('Locale delegate provides list of locales()', () {
     expect(localeDelegate.locales(), completion(isNotEmpty));
