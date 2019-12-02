@@ -97,9 +97,7 @@ void main() {
   test('invalid locale gives null', () {
     checkLocaleTranslation(Locale('de'), 'zz', null);
   });
-  test(
-      'localized locale falls back to language when given invalid country for locale',
-      () {
+  test('localized locale falls back to language when given invalid country for locale', () {
     checkLocaleTranslation(
         Locale('de', 'UK'), 'es_AR', 'Spanisch (Argentinien)');
   });
