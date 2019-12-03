@@ -100,11 +100,11 @@ abstract class _BaseNamesLocalizationsDelegate<T>
 class CountryNamesLocalizationsDelegate
     extends _BaseNamesLocalizationsDelegate<CountryNames> {
   const CountryNamesLocalizationsDelegate({AssetBundle bundle})
-      : super(bundle: bundle, dataPath: 'data/countries/');
+      : super(bundle: bundle, dataPath: 'data/countries');
 }
 
 class LocaleNamesLocalizationsDelegate
     extends _BaseNamesLocalizationsDelegate<LocaleNames> {
   const LocaleNamesLocalizationsDelegate({AssetBundle bundle})
-      : super(bundle: bundle, dataPath: 'data/locales/');
+      : super(bundle: bundle, dataPath: 'data/locales');
 }
