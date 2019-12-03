@@ -24,5 +24,6 @@ dependency_overrides:
 
 flutter:
    assets:
-    - data/
+    - data/locales/
+    - data/countries/
     - languages.json
