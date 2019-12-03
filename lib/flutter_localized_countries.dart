@@ -36,8 +36,8 @@ class CountryNames extends _BaseNames {
 class LocaleNames extends _BaseNames {
   LocaleNames(String locale, Map<String, String> data) : super(locale, data);
 
-  static CountryNames of(BuildContext context) {
-    return Localizations.of<CountryNames>(context, CountryNames);
+  static LocaleNames of(BuildContext context) {
+    return Localizations.of<LocaleNames>(context, LocaleNames);
   }
 }
 
