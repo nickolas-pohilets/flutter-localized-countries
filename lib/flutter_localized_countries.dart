@@ -7,11 +7,7 @@ import 'package:intl/intl.dart';
 import 'dart:convert';
 
 // Base class for country and locale names
-class _BaseNames<T> {
-  static T of<T>(BuildContext context) {
-    return Localizations.of<T>(context, CountryNames);
-  }
-
+class _BaseNames {
   final String locale;
   final Map<String, String> data;
   _BaseNames(this.locale, this.data);
@@ -29,12 +25,20 @@ class _BaseNames<T> {
   toString() => locale;
 }
 
-class CountryNames extends _BaseNames<CountryNames> {
+class CountryNames extends _BaseNames {
   CountryNames(String locale, Map<String, String> data) : super(locale, data);
+
+  static CountryNames of(BuildContext context) {
+    return Localizations.of<CountryNames>(context, CountryNames);
+  }
 }
 
-class LocaleNames extends _BaseNames<LocaleNames> {
+class LocaleNames extends _BaseNames {
   LocaleNames(String locale, Map<String, String> data) : super(locale, data);
+
+  static CountryNames of(BuildContext context) {
+    return Localizations.of<CountryNames>(context, CountryNames);
+  }
 }
 
 abstract class _BaseNamesLocalizationsDelegate<T>
