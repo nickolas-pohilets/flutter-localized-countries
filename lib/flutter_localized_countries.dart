@@ -116,7 +116,7 @@ class LocaleNamesLocalizationsDelegate
   /// Returns a [Map] of locale codes to their native locale name.
   Future<Map<String, String>> getLocaleNativeNames() async {
     return Map<String, String>.from(
-      await _loadJSON('data/locales_native_names.json'),
+      await _loadJSON('data/locales/_locales_native_names.json'),
     );
   }
 }
