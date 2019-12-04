@@ -57,17 +57,9 @@ abstract class _BaseNamesLocalizationsDelegate<T>
 
   @override
   Future<T> load(Locale locale) async {
-    final String name =
-        locale.countryCode == null ? locale.languageCode : locale.toString();
-    final String localeName = Intl.canonicalizedLocale(name);
-
     var locales = Set<String>.from(await this.locales());
 
-    var availableLocale = Intl.verifiedLocale(
-      localeName,
-      (locale) => locales.contains(locale),
-      onFailure: (_) => 'en',
-    );
+    var availableLocale = _getAvailableLocale(locale, locales, 'en');
     if (availableLocale == null) {
       return null;
     }
@@ -89,6 +81,19 @@ abstract class _BaseNamesLocalizationsDelegate<T>
     return false;
   }
 
+  String _getAvailableLocale(Locale locale, Set<String> locales,
+      [String fallbackLocale]) {
+    final String name =
+        locale.countryCode == null ? locale.languageCode : locale.toString();
+    final String canonicalLocale = Intl.canonicalizedLocale(name);
+
+    return Intl.verifiedLocale(
+      canonicalLocale,
+      (locale) => locales.contains(locale),
+      onFailure: (_) => fallbackLocale,
+    );
+  }
+
   Future<dynamic> _loadJSON(key) {
     Future<dynamic> parser(String data) async => jsonDecode(data);
     final bundle = this.bundle ?? rootBundle;
@@ -107,4 +112,25 @@ class LocaleNamesLocalizationsDelegate
     extends _BaseNamesLocalizationsDelegate<LocaleNames> {
   const LocaleNamesLocalizationsDelegate({AssetBundle bundle})
       : super(bundle: bundle, dataPath: 'data/locales');
+
+  /// Returns a locale's name in its own locale.
+  /// ```
+  ///
+  /// print(getLocaleSelfName(Locale('en')); // "English"
+  /// print(getLocaleSelfName(Locale('es')); // "español"
+  ///
+  /// ```
+  Future<String> getLocaleSelfName(Locale locale) async {
+    var locales = Set<String>.from(await this.locales());
+
+    final String availableLocale = _getAvailableLocale(locale, locales);
+    if (availableLocale == null) {
+      return null;
+    }
+
+    final data = Map<String, String>.from(
+      await _loadJSON('data/locales_self.json'),
+    );
+    return data[availableLocale];
+  }
 }

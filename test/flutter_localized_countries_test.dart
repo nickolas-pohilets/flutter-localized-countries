@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_localized_countries/flutter_localized_countries.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:path/path.dart';
+import 'package:path/path.dart' as path;
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -11,8 +11,9 @@ class TestAssetBundle extends CachingAssetBundle {
   Future<ByteData> load(String key) async {
     const prefix = "packages/flutter_localized_countries/";
     if (key.startsWith(prefix)) {
-      var path = join(dirname(Platform.script.toFilePath()), key.substring(prefix.length));
-      var bytes = Uint8List.fromList(await File(path).readAsBytes());
+      var fullPath = path.join(path.dirname(Platform.script.toFilePath()),
+          key.substring(prefix.length));
+      var bytes = Uint8List.fromList(await File(fullPath).readAsBytes());
       var buffer = bytes.buffer;
       return ByteData.view(buffer);
     }
@@ -88,6 +89,21 @@ void localeTests() {
     var matcher = completion(predicate(f, 'name of the $cc is "$name"'));
     expect(d.load(locale), matcher);
   }
+
+  void checkLocaleSelfName(Locale locale, String expectedLocaleName) {
+    var d = localeDelegate;
+    var matcher = completion(equals(expectedLocaleName));
+    expect(d.getLocaleSelfName(locale), matcher);
+  }
+
+  test('can get locale\'s own name', () {
+    checkLocaleSelfName(Locale('de'), 'Deutsch');
+    checkLocaleSelfName(Locale('de', 'AT'), 'Deutsch (Österreich)');
+    checkLocaleSelfName(Locale('de', 'UK'), 'Deutsch');
+    checkLocaleSelfName(Locale('en'), 'English');
+    checkLocaleSelfName(Locale('en', 'GB'), 'English (United Kingdom)');
+    checkLocaleSelfName(Locale('zz'), null);
+  });
 
   test('localizes locale by language', () {
     checkLocaleTranslation(Locale('de'), 'de_CH', 'Deutsch (Schweiz)');
