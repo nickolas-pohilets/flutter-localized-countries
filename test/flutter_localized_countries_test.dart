@@ -83,27 +83,16 @@ void localeTests() {
     expect(localeDelegate.locales(), completion(isNotEmpty));
   });
 
+  test('Locale delegate provides map of native locale names', () {
+    expect(localeDelegate.getLocaleNativeNames(), completion(isNotEmpty));
+  });
+
   void checkLocaleTranslation(Locale locale, String cc, String name) {
     var d = localeDelegate;
     var f = (LocaleNames cn) => cn.nameOf(cc) == name;
     var matcher = completion(predicate(f, 'name of the $cc is "$name"'));
     expect(d.load(locale), matcher);
   }
-
-  void checkLocaleSelfName(Locale locale, String expectedLocaleName) {
-    var d = localeDelegate;
-    var matcher = completion(equals(expectedLocaleName));
-    expect(d.getLocaleSelfName(locale), matcher);
-  }
-
-  test('can get locale\'s own name', () {
-    checkLocaleSelfName(Locale('de'), 'Deutsch');
-    checkLocaleSelfName(Locale('de', 'AT'), 'Deutsch (Österreich)');
-    checkLocaleSelfName(Locale('de', 'UK'), 'Deutsch');
-    checkLocaleSelfName(Locale('en'), 'English');
-    checkLocaleSelfName(Locale('en', 'GB'), 'English (United Kingdom)');
-    checkLocaleSelfName(Locale('zz'), null);
-  });
 
   test('localizes locale by language', () {
     checkLocaleTranslation(Locale('de'), 'de_CH', 'Deutsch (Schweiz)');
@@ -116,11 +105,17 @@ void localeTests() {
     checkLocaleTranslation(Locale('de', 'AT'), 'be', 'Weißrussisch');
     checkLocaleTranslation(Locale('de', 'CH'), 'en_GB', 'Englisch (Grossbritannien)');
     checkLocaleTranslation(Locale('de'), 'en_GB', 'Englisch (Vereinigtes Königreich)');
+    checkLocaleTranslation(
+        Locale('de', 'CH'), 'en_GB', 'Englisch (Grossbritannien)');
+    checkLocaleTranslation(
+        Locale('de'), 'en_GB', 'Englisch (Vereinigtes Königreich)');
   });
   test('invalid locale gives null', () {
     checkLocaleTranslation(Locale('de'), 'zz', null);
   });
-  test('localized locale falls back to language when given invalid country for locale', () {
+  test(
+      'localized locale falls back to language when given invalid country for locale',
+      () {
     checkLocaleTranslation(
         Locale('de', 'UK'), 'es_AR', 'Spanisch (Argentinien)');
   });

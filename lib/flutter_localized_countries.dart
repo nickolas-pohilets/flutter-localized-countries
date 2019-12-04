@@ -113,24 +113,10 @@ class LocaleNamesLocalizationsDelegate
   const LocaleNamesLocalizationsDelegate({AssetBundle bundle})
       : super(bundle: bundle, dataPath: 'data/locales');
 
-  /// Returns a locale's name in its own locale.
-  /// ```
-  ///
-  /// print(getLocaleSelfName(Locale('en')); // "English"
-  /// print(getLocaleSelfName(Locale('es')); // "español"
-  ///
-  /// ```
-  Future<String> getLocaleSelfName(Locale locale) async {
-    var locales = Set<String>.from(await this.locales());
-
-    final String availableLocale = _getAvailableLocale(locale, locales);
-    if (availableLocale == null) {
-      return null;
-    }
-
-    final data = Map<String, String>.from(
-      await _loadJSON('data/locales_self.json'),
+  /// Returns a [Map] of locale codes to their native locale name.
+  Future<Map<String, String>> getLocaleNativeNames() async {
+    return Map<String, String>.from(
+      await _loadJSON('data/locales_native_names.json'),
     );
-    return data[availableLocale];
   }
 }
