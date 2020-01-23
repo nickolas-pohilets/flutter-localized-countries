@@ -47,9 +47,9 @@ abstract class _BaseNamesLocalizationsDelegate<T>
   final dataPath;
   const _BaseNamesLocalizationsDelegate({this.bundle, this.dataPath});
 
-  Future<List<String>> locales() async {
+  Future<List<String>> codes() async {
     return List<String>.from(
-        await _loadJSON('languages.json') as List<dynamic>);
+        await _loadJSON('$dataPath/_codes.json') as List<dynamic>);
   }
 
   @override
@@ -57,9 +57,9 @@ abstract class _BaseNamesLocalizationsDelegate<T>
 
   @override
   Future<T> load(Locale locale) async {
-    var locales = Set<String>.from(await this.locales());
+    var codes = Set<String>.from(await this.codes());
 
-    var availableLocale = _getAvailableLocale(locale, locales, 'en');
+    var availableLocale = _getAvailableLocale(locale, codes, 'en');
     if (availableLocale == null) {
       return null;
     }
@@ -81,7 +81,7 @@ abstract class _BaseNamesLocalizationsDelegate<T>
     return false;
   }
 
-  String _getAvailableLocale(Locale locale, Set<String> locales,
+  String _getAvailableLocale(Locale locale, Set<String> codes,
       [String fallbackLocale]) {
     final String name =
         locale.countryCode == null ? locale.languageCode : locale.toString();
@@ -89,7 +89,7 @@ abstract class _BaseNamesLocalizationsDelegate<T>
 
     return Intl.verifiedLocale(
       canonicalLocale,
-      (locale) => locales.contains(locale),
+      (locale) => codes.contains(locale),
       onFailure: (_) => fallbackLocale,
     );
   }

@@ -26,4 +26,3 @@ flutter:
    assets:
     - data/locales/
     - data/countries/
-    - languages.json
