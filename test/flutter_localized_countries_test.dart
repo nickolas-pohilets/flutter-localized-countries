@@ -30,8 +30,8 @@ void countryTests() {
   final bundle = TestAssetBundle();
 
   var countryDelegate = CountryNamesLocalizationsDelegate(bundle: bundle);
-  test('Country delegate provides list of locales()', () {
-    expect(countryDelegate.locales(), completion(isNotEmpty));
+  test('Country delegate provides list of locale codes()', () {
+    expect(countryDelegate.codes(), completion(isNotEmpty));
   });
 
   void checkCountryTranslation(Locale locale, String cc, String name) {
@@ -79,8 +79,8 @@ void localeTests() {
   final bundle = TestAssetBundle();
 
   var localeDelegate = LocaleNamesLocalizationsDelegate(bundle: bundle);
-  test('Locale delegate provides list of locales()', () {
-    expect(localeDelegate.locales(), completion(isNotEmpty));
+  test('Locale delegate provides list of locale codes', () {
+    expect(localeDelegate.codes(), completion(isNotEmpty));
   });
 
   test('Locale delegate provides map of native locale names', () {
@@ -103,8 +103,10 @@ void localeTests() {
   test('localizes locale by language and country', () {
     checkLocaleTranslation(Locale('de', 'CH'), 'be', 'Weissrussisch');
     checkLocaleTranslation(Locale('de', 'AT'), 'be', 'Weißrussisch');
-    checkLocaleTranslation(Locale('de', 'CH'), 'en_GB', 'Englisch (Grossbritannien)');
-    checkLocaleTranslation(Locale('de'), 'en_GB', 'Englisch (Vereinigtes Königreich)');
+    checkLocaleTranslation(
+        Locale('de', 'CH'), 'en_GB', 'Englisch (Grossbritannien)');
+    checkLocaleTranslation(
+        Locale('de'), 'en_GB', 'Englisch (Vereinigtes Königreich)');
     checkLocaleTranslation(
         Locale('de', 'CH'), 'en_GB', 'Englisch (Grossbritannien)');
     checkLocaleTranslation(
