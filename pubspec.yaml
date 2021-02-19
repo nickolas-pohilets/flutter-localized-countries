@@ -1,6 +1,6 @@
 name: flutter_localized_countries
 description: Country code to name mappings for several languages
-version: 1.0.1
+version: 1.1.0
 author: Mykola Pokhylets <pohilets@gmail.com>
 homepage: https://github.com/nickolas-pohilets/flutter-localized-countries
 
@@ -12,15 +12,12 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  intl: ^0.16.0
+  intl: ">=0.16.0 <0.18.0"
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   path: ^1.6.2
-
-dependency_overrides:
-  intl: ^0.16.0
 
 flutter:
    assets:
